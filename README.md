@@ -1,0 +1,2 @@
+# NoobruStockPredict
+LatestSalesPredictor-onlyCustomDates-NotworkingProperly
