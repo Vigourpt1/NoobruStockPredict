@@ -13,11 +13,11 @@ export function filterDataByPeriod(
 
   return data.filter(order => {
     try {
-      const orderDate = new Date(order.date);
+      const orderDate = parseDate(order.date);
       
       if (periodType === 'custom' && customRange) {
-        const start = new Date(customRange.start);
-        const end = new Date(customRange.end);
+        const start = parseDate(customRange.start);
+        const end = parseDate(customRange.end);
         return orderDate >= start && orderDate <= end;
       }
 
@@ -51,13 +51,13 @@ export function calculatePeriodMetrics(data: OrderData[]) {
   }
 
   const uniqueOrders = new Set(data.map(order => order.order_number));
-  const uniqueSkus = new Set(data.flatMap(order => order.sku));
+  const uniqueSkus = new Set(data.map(order => order.sku));
   const totalItems = data.reduce((sum, order) => sum + order.quantity, 0);
 
   return {
     totalOrders: uniqueOrders.size,
     totalItems,
-    averageOrderSize: totalItems / uniqueOrders.size,
+    averageOrderSize: totalItems / uniqueOrders.size || 0,
     uniqueSkus: uniqueSkus.size
   };
 }
@@ -74,7 +74,7 @@ export function getAvailablePeriods(data: OrderData[]) {
 
   const periods = data.reduce((acc, order) => {
     try {
-      const date = new Date(order.date);
+      const date = parseDate(order.date);
       acc.weeks.add(getWeekKey(date));
       acc.months.add(getMonthKey(date));
       acc.quarters.add(getQuarterKey(date));

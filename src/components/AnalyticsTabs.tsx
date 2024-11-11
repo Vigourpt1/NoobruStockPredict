@@ -11,9 +11,15 @@ interface AnalyticsTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   selectedPeriods: {
-    type: 'week' | 'month' | 'quarter' | 'year';
+    type: 'week' | 'month' | 'quarter' | 'year' | 'custom';
     period1: string;
     period2: string;
+    customRange?: {
+      start1: string;
+      end1: string;
+      start2: string;
+      end2: string;
+    };
   };
 }
 

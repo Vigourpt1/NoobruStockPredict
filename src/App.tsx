@@ -59,8 +59,8 @@ export default function App() {
   };
 
   const handleExportPDF = () => {
-    let period1Data = data;
-    let period2Data = data;
+    let period1Data: OrderData[] = [];
+    let period2Data: OrderData[] = [];
 
     if (selectedPeriods.type === 'custom' && selectedPeriods.customRange) {
       period1Data = filterDataByPeriod(data, 'custom', '', {
@@ -86,6 +86,53 @@ export default function App() {
         orders: document.getElementById('order-analysis'),
         customers: document.getElementById('customer-insights')
       }
+    });
+  };
+
+  const handlePeriodTypeChange = (type: 'week' | 'month' | 'quarter' | 'year' | 'custom') => {
+    if (type === 'custom') {
+      setSelectedPeriods({
+        ...selectedPeriods,
+        type,
+        customRange: {
+          start1: '',
+          end1: '',
+          start2: '',
+          end2: ''
+        }
+      });
+    } else {
+      const availablePeriods = getAvailablePeriods(data);
+      const periods = availablePeriods[`${type}s`];
+      if (periods.length >= 2) {
+        setSelectedPeriods({
+          type,
+          period1: periods[periods.length - 2],
+          period2: periods[periods.length - 1],
+          customRange: undefined
+        });
+      }
+    }
+  };
+
+  const handlePeriodChange = (period1: string, period2: string) => {
+    setSelectedPeriods({
+      ...selectedPeriods,
+      period1,
+      period2
+    });
+  };
+
+  const handleCustomRangeChange = (customRange: {
+    start1: string;
+    end1: string;
+    start2: string;
+    end2: string;
+  }) => {
+    setSelectedPeriods({
+      ...selectedPeriods,
+      type: 'custom',
+      customRange
     });
   };
 
@@ -119,27 +166,9 @@ export default function App() {
             <TimeComparisonSelector
               availablePeriods={availablePeriods}
               selectedPeriods={selectedPeriods}
-              onPeriodTypeChange={(type) => {
-                setSelectedPeriods({
-                  ...selectedPeriods,
-                  type,
-                  period1: type === 'custom' ? selectedPeriods.period1 : availablePeriods[`${type}s`][0],
-                  period2: type === 'custom' ? selectedPeriods.period2 : availablePeriods[`${type}s`][1]
-                });
-              }}
-              onPeriodChange={(period1, period2) => {
-                setSelectedPeriods({
-                  ...selectedPeriods,
-                  period1,
-                  period2
-                });
-              }}
-              onCustomRangeChange={(customRange) => {
-                setSelectedPeriods({
-                  ...selectedPeriods,
-                  customRange
-                });
-              }}
+              onPeriodTypeChange={handlePeriodTypeChange}
+              onPeriodChange={handlePeriodChange}
+              onCustomRangeChange={handleCustomRangeChange}
             />
 
             <AnalyticsTabs 

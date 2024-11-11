@@ -15,15 +15,40 @@ import { filterDataByPeriod } from '../../utils/timeComparison';
 interface OrderAnalysisProps {
   data: OrderData[];
   selectedPeriods: {
-    type: 'week' | 'month' | 'quarter' | 'year';
+    type: 'week' | 'month' | 'quarter' | 'year' | 'custom';
     period1: string;
     period2: string;
+    customRange?: {
+      start1: string;
+      end1: string;
+      start2: string;
+      end2: string;
+    };
   };
 }
 
 export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
-  const period1Data = filterDataByPeriod(data, selectedPeriods.type, selectedPeriods.period1);
-  const period2Data = filterDataByPeriod(data, selectedPeriods.type, selectedPeriods.period2);
+  const period1Data = selectedPeriods.type === 'custom' && selectedPeriods.customRange
+    ? filterDataByPeriod(data, 'custom', '', {
+        start: selectedPeriods.customRange.start1,
+        end: selectedPeriods.customRange.end1
+      })
+    : filterDataByPeriod(data, selectedPeriods.type, selectedPeriods.period1);
+
+  const period2Data = selectedPeriods.type === 'custom' && selectedPeriods.customRange
+    ? filterDataByPeriod(data, 'custom', '', {
+        start: selectedPeriods.customRange.start2,
+        end: selectedPeriods.customRange.end2
+      })
+    : filterDataByPeriod(data, selectedPeriods.type, selectedPeriods.period2);
+
+  const period1Label = selectedPeriods.type === 'custom' && selectedPeriods.customRange
+    ? `${selectedPeriods.customRange.start1} to ${selectedPeriods.customRange.end1}`
+    : selectedPeriods.period1;
+
+  const period2Label = selectedPeriods.type === 'custom' && selectedPeriods.customRange
+    ? `${selectedPeriods.customRange.start2} to ${selectedPeriods.customRange.end2}`
+    : selectedPeriods.period2;
 
   const calculateMetrics = (periodData: OrderData[]) => {
     const orderSizes = new Map<string, number>();
@@ -51,8 +76,8 @@ export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
 
   const chartData = Object.keys(period1Metrics.sizeRanges).map(range => ({
     range,
-    [selectedPeriods.period1]: period1Metrics.sizeRanges[range as keyof typeof period1Metrics.sizeRanges],
-    [selectedPeriods.period2]: period2Metrics.sizeRanges[range as keyof typeof period2Metrics.sizeRanges]
+    [period1Label]: period1Metrics.sizeRanges[range as keyof typeof period1Metrics.sizeRanges],
+    [period2Label]: period2Metrics.sizeRanges[range as keyof typeof period2Metrics.sizeRanges]
   }));
 
   return (
@@ -62,13 +87,13 @@ export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
           <h4 className="text-sm font-medium text-blue-900">Average Order Size</h4>
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div>
-              <p className="text-xs text-blue-700">{selectedPeriods.period1}</p>
+              <p className="text-xs text-blue-700">{period1Label}</p>
               <p className="text-xl font-bold text-blue-600">
                 {period1Metrics.averageSize.toFixed(1)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-blue-700">{selectedPeriods.period2}</p>
+              <p className="text-xs text-blue-700">{period2Label}</p>
               <p className="text-xl font-bold text-blue-600">
                 {period2Metrics.averageSize.toFixed(1)}
               </p>
@@ -80,13 +105,13 @@ export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
           <h4 className="text-sm font-medium text-green-900">Largest Order</h4>
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div>
-              <p className="text-xs text-green-700">{selectedPeriods.period1}</p>
+              <p className="text-xs text-green-700">{period1Label}</p>
               <p className="text-xl font-bold text-green-600">
                 {period1Metrics.maxSize}
               </p>
             </div>
             <div>
-              <p className="text-xs text-green-700">{selectedPeriods.period2}</p>
+              <p className="text-xs text-green-700">{period2Label}</p>
               <p className="text-xl font-bold text-green-600">
                 {period2Metrics.maxSize}
               </p>
@@ -98,13 +123,13 @@ export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
           <h4 className="text-sm font-medium text-purple-900">Total Orders</h4>
           <div className="grid grid-cols-2 gap-2 mt-2">
             <div>
-              <p className="text-xs text-purple-700">{selectedPeriods.period1}</p>
+              <p className="text-xs text-purple-700">{period1Label}</p>
               <p className="text-xl font-bold text-purple-600">
                 {period1Metrics.totalOrders}
               </p>
             </div>
             <div>
-              <p className="text-xs text-purple-700">{selectedPeriods.period2}</p>
+              <p className="text-xs text-purple-700">{period2Label}</p>
               <p className="text-xl font-bold text-purple-600">
                 {period2Metrics.totalOrders}
               </p>
@@ -123,8 +148,8 @@ export function OrderAnalysis({ data, selectedPeriods }: OrderAnalysisProps) {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey={selectedPeriods.period1} fill="#60a5fa" />
-              <Bar dataKey={selectedPeriods.period2} fill="#34d399" />
+              <Bar dataKey={period1Label} fill="#60a5fa" />
+              <Bar dataKey={period2Label} fill="#34d399" />
             </BarChart>
           </ResponsiveContainer>
         </div>

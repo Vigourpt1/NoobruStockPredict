@@ -18,7 +18,7 @@ export function parseDate(dateStr: string): Date {
     }
     return parsedDate;
   } catch (error) {
-    console.error('Error parsing date:', dateStr, error);
+    console.error('Error parsing date:', error);
     throw new Error(`Invalid date format: ${dateStr}`);
   }
 }
@@ -27,7 +27,7 @@ export function formatDate(date: Date): string {
   try {
     return format(date, 'yyyy-MM-dd');
   } catch (error) {
-    console.error('Error formatting date:', date, error);
+    console.error('Error formatting date:', error);
     return 'Invalid Date';
   }
 }
@@ -38,7 +38,7 @@ export function formatWeekRange(date: Date): string {
     const end = endOfWeek(date, { weekStartsOn: 1 });
     return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
   } catch (error) {
-    console.error('Error formatting week range:', date, error);
+    console.error('Error formatting week range:', error);
     return 'Invalid Week Range';
   }
 }
@@ -47,7 +47,7 @@ export function getMonthKey(date: Date): string {
   try {
     return format(date, 'yyyy-MM');
   } catch (error) {
-    console.error('Error getting month key:', date, error);
+    console.error('Error getting month key:', error);
     return 'Invalid Month';
   }
 }
@@ -58,7 +58,7 @@ export function getQuarterKey(date: Date): string {
     const quarter = Math.floor(month / 3) + 1;
     return `${date.getFullYear()}-Q${quarter}`;
   } catch (error) {
-    console.error('Error getting quarter key:', date, error);
+    console.error('Error getting quarter key:', error);
     return 'Invalid Quarter';
   }
 }
@@ -67,7 +67,7 @@ export function getYearKey(date: Date): string {
   try {
     return format(date, 'yyyy');
   } catch (error) {
-    console.error('Error getting year key:', date, error);
+    console.error('Error getting year key:', error);
     return 'Invalid Year';
   }
 }
@@ -77,7 +77,7 @@ export function getWeekKey(date: Date): string {
     const start = startOfWeek(date, { weekStartsOn: 1 });
     return format(start, 'yyyy-MM-dd');
   } catch (error) {
-    console.error('Error getting week key:', date, error);
+    console.error('Error getting week key:', error);
     return 'Invalid Week';
   }
 }
@@ -99,11 +99,13 @@ export function formatPeriod(type: string, value: string): string {
       }
       case 'year':
         return value;
+      case 'custom':
+        return value;
       default:
         return value;
     }
   } catch (error) {
-    console.error('Error formatting period:', type, value, error);
+    console.error('Error formatting period:', error);
     return 'Invalid Period';
   }
 }
@@ -114,7 +116,7 @@ export function getWeekRange(weekKey: string): { start: Date; end: Date } {
     const end = addDays(start, 6);
     return { start, end };
   } catch (error) {
-    console.error('Error getting week range:', weekKey, error);
+    console.error('Error getting week range:', error);
     throw new Error(`Invalid week key: ${weekKey}`);
   }
 }
